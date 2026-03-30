@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin Pro - Yayasan Peduli Kasih</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f0f2f5; padding: 20px; font-family: 'Poppins', sans-serif; }
+        .admin-container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .header-admin { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        h1 { color: #2b6cb0; margin: 0; font-weight: 600; font-size: 24px; }
+        
+        .btn-group { display: flex; gap: 10px; }
+        .btn-export { background-color: #38a169; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-export:hover { background-color: #2f855a; }
+
+        .tab-wrapper { margin-bottom: 20px; text-align: left; border-bottom: 2px solid #edf2f7; padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: #edf2f7; border-radius: 8px; margin-right: 5px; font-weight: 600; color: #4a5568; }
+        .tab-btn.active { background: #2b6cb0; color: white; }
+        
+        .table-container { overflow-x: auto; background: #fff; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th, td { padding: 15px; border-bottom: 1px solid #edf2f7; text-align: left; }
+        th { background-color: #f7fafc; color: #2b6cb0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .btn-delete { background: #fff5f5; color: #e53e3e; border: 1px solid #feb2b2; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
+        .btn-delete:hover { background: #e53e3e; color: white; }
+        
+        .loading { text-align: center; padding: 40px; color: #2b6cb0; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="header-admin">
+            <h1>Dashboard Admin Yayasan</h1>
+            <div class="btn-group">
+                <button class="btn-export" onclick="exportToExcel()">📊 Ekspor Excel</button>
+            </div>
+        </div>
+        
+        <div class="tab-wrapper">
+            <button class="tab-btn active" id="btn-donasi" onclick="showTab(event, 'donasi')">Daftar Donasi</button>
+            <button class="tab-btn" id="btn-konsultasi" onclick="showTab(event, 'konsultasi')">Daftar Konsultasi</button>
+        </div>
+
+        <div id="content-area" class="table-container">
+            <p class="loading">Memuat data...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeI1-EfKAUNqkH65U8SrUhlFh9Ua-mtbE",
+            authDomain: "yayasan-24.firebaseapp.com",
+            projectId: "yayasan-24",
+            storageBucket: "yayasan-24.firebasestorage.app",
+            messagingSenderId: "303378687484",
+            appId: "1:303378687484:web:d9d30811f54541a5427e79"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentData = [];
+        let currentTab = 'donasi';
+
+        // FUNGSI TAMPIL DATA
+        window.showTab = function(e, type) {
+            currentTab = type;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (e && e.target) e.target.classList.add('active');
+            else document.getElementById('btn-' + type).classList.add('active');
+
+            const q = query(collection(db, type), orderBy("waktu", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                currentData = [];
+                let html = `<table><thead><tr>
+                    <th>Nama</th>
+                    <th>${type === 'donasi' ? 'Nominal' : 'Topik'}</th>
+                    <th>Pesan/Catatan</th>
+                    <th>Waktu</th>
+                    <th>Aksi</th>
+                </tr></thead><tbody>`;
+                
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    const waktuStr = data.waktu ? data.waktu.toDate().toLocaleString('id-ID') : '-';
+                    const isiUtama = type === 'donasi' ? data.nominal : data.topik;
+                    const isiPesan = type === 'donasi' ? (data.pesan || '-') : (data.cerita || '-');
+
+                    currentData.push({ nama: data.nama, materi: isiUtama, pesan: isiPesan, waktu: waktuStr });
+
+                    html += `<tr>
+                        <td>${data.nama}</td>
+                        <td><strong>${type === 'donasi' ? 'Rp' + isiUtama.toLocaleString('id-ID') : isiUtama}</strong></td>
+                        <td>${isiPesan}</td>
+                        <td style="font-size: 11px; color: #718096;">${waktuStr}</td>
+                        <td><button class="btn-delete" onclick="hapusData('${type}', '${id}')">Hapus</button></td>
+                    </tr>`;
+                });
+                
+                html += "</tbody></table>";
+                document.getElementById('content-area').innerHTML = currentData.length ? html : "<p style='text-align:center;padding:40px;'>Belum ada data masuk.</p>";
+            });
+        }
+
+        // FUNGSI HAPUS DATA
+        window.hapusData = async function(type, id) {
+            if (confirm("Apakah Anda yakin ingin menghapus data ini secara permanen?")) {
+                try {
+                    await deleteDoc(doc(db, type, id));
+                    alert("Data berhasil dihapus.");
+                } catch (error) {
+                    alert("Gagal menghapus: " + error.message);
+                }
+            }
+        }
+
+        // FUNGSI EKSPOR CSV
+        window.exportToExcel = function() {
+            if (!currentData.length) return alert("Data kosong!");
+            let csv = "Nama,Isi,Pesan,Waktu\n";
+            currentData.forEach(r => csv += `"${r.nama}","${r.materi}","${r.pesan}","${r.waktu}"\n`);
+            const link = document.createElement("a");
+            link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+            link.download = `Laporan_${currentTab}.csv`;
+            link.click();
+        }
+
+        showTab(null, 'donasi');
+    </script>
+</body>
+</html>

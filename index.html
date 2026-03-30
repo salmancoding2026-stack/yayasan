@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yayasan Peduli Kasih | Pemberdayaan ODGJ & ABK</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo">Peduli<span>Kasih</span></div>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="#beranda">Beranda</a></li>
+                    <li><a href="#karya">Karya Kebun</a></li>
+                    <li><a href="#konsultasi">Konsultasi</a></li>
+                    <li><a href="#donasi" class="btn-nav">Donasi</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="beranda" class="hero">
+        <div class="hero-content">
+            <h1>Mewujudkan Kemandirian & Harapan</h1>
+            <p>Mendukung teman-teman ODGJ dan ABK melalui terapi berkebun dan kasih sayang yang tulus.</p>
+            <div class="hero-btns">
+                <a href="#donasi" class="btn-primary">Mulai Donasi</a>
+                <a href="#karya" class="btn-secondary">Lihat Hasil Kebun</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="karya" class="section">
+        <div class="container">
+            <h2 class="section-title">Karya Kebun & Terapi</h2>
+            <p class="section-subtitle">Dukung kemandirian mereka dengan membeli hasil program Terapi Berkebun. 100% hasil penjualan kembali ke yayasan.</p>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?q=80&w=400')"></div>
+                    <div class="card-body">
+                        <h3>Teh Bunga Telang</h3>
+                        <p>Organik, segar, dan dikemas dengan cinta oleh teman-teman yayasan.</p>
+                        <button class="btn-buy" onclick="pesanProduk('Teh Bunga Telang')">Pesan via WA</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1496062031456-07b8f162a322?q=80&w=400')"></div>
+                    <div class="card-body">
+                        <h3>Bibit Bunga Mawar</h3>
+                        <p>Bibit pilihan hasil budidaya kebun terapi kami untuk taman Anda.</p>
+                        <button class="btn-buy" onclick="pesanProduk('Bibit Bunga Mawar')">Pesan via WA</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="konsultasi" class="section bg-light">
+        <div class="container small-container">
+            <h2 class="section-title">Layanan Konsultasi</h2>
+            <div class="form-card">
+                <form id="formKonsultasi">
+                    <input type="text" id="namaKonsul" placeholder="Nama Anda" required>
+                    <select id="kategoriKonsul" required>
+                        <option value="" disabled selected>Pilih Topik Konsultasi...</option>
+                        <option value="Dukungan Psikologi">Psikologi & Mental Keluarga</option>
+                        <option value="Dukungan Bisnis">Bisnis & Ekonomi Keluarga</option>
+                        <option value="Medis">Arahan Medis Awal</option>
+                    </select>
+                    <textarea id="ceritaKonsul" placeholder="Ceritakan kondisi singkat Anda..." rows="4" required></textarea>
+                    <button type="submit" class="btn-full btn-green">Jadwalkan Konsultasi</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="donasi" class="section">
+        <div class="container small-container">
+            <h2 class="section-title">Salurkan Kebaikan</h2>
+            <div class="form-card donation-card">
+                <form id="formDonasi">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="nama" required>
+                    <label>Nominal Donasi (Rp)</label>
+                    <input type="number" id="nominal" placeholder="Contoh: 100000" required>
+                    <label>Pesan/Doa</label>
+                    <textarea id="pesan" rows="3"></textarea>
+                    <button type="submit" class="btn-full btn-blue">Kirim Konfirmasi Donasi</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Yayasan Peduli Kasih. Bersama Menciptakan Inklusi.</p>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
